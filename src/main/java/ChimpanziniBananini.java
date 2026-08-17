@@ -8,6 +8,9 @@ public class ChimpanziniBananini {
         System.out.println();
         Scanner scanner = new Scanner(System.in);
 
+        String[] items = new String[100];
+        int itemCount = 0;
+
         while (true) {
             String input = scanner.nextLine();
 
@@ -15,7 +18,15 @@ public class ChimpanziniBananini {
                 break;
             }
 
-            System.out.println(input);
+            if (input.equals("list")) {
+                for (int i = 0; i < itemCount; i++) {
+                    System.out.println((i + 1) + ". " + items[i]);
+                }
+            } else {
+                items[itemCount] = input;
+                itemCount++;
+                System.out.println("added: " + input);
+            }
         }
 
         scanner.close();
