@@ -8,7 +8,7 @@ public class ChimpanziniBananini {
         System.out.println();
         Scanner scanner = new Scanner(System.in);
 
-        String[] items = new String[100];
+        Task[] tasks = new Task[100];
         int itemCount = 0;
 
         while (true) {
@@ -20,10 +20,16 @@ public class ChimpanziniBananini {
 
             if (input.equals("list")) {
                 for (int i = 0; i < itemCount; i++) {
-                    System.out.println((i + 1) + ". " + items[i]);
+                    System.out.println((i + 1) + ". " + tasks[i]);
                 }
+            } else if (input.startsWith("mark ")) {
+                int taskNumber = Integer.parseInt(input.substring(5));
+                tasks[taskNumber - 1].markAsDone();
+
+                System.out.println("Nice! I've marked this task as done:");
+                System.out.println("  " + tasks[taskNumber - 1]);
             } else {
-                items[itemCount] = input;
+                tasks[itemCount] = new Task(input);
                 itemCount++;
                 System.out.println("added: " + input);
             }
