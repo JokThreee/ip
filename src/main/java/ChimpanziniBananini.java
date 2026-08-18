@@ -14,60 +14,73 @@ public class ChimpanziniBananini {
         while (true) {
             String input = scanner.nextLine();
 
-            if (input.equals("bye")) {
-                break;
-            }
-
-            if (input.equals("list")) {
-                for (int i = 0; i < itemCount; i++) {
-                    System.out.println((i + 1) + ". " + tasks[i]);
+            try {
+                if (input.equals("bye")) {
+                    break;
                 }
-            } else if (input.startsWith("mark ")) {
-                int taskNumber = Integer.parseInt(input.substring(5));
-                tasks[taskNumber - 1].markAsDone();
 
-                System.out.println("Nice! I've marked this task as done:");
-                System.out.println("  " + tasks[taskNumber - 1]);
-            } else if (input.startsWith("todo ")) {
-                String description = input.substring(5);
+                if (input.equals("list")) {
+                    for (int i = 0; i < itemCount; i++) {
+                        System.out.println((i + 1) + ". " + tasks[i]);
+                    }
+                } else if (input.startsWith("mark ")) {
+                    int taskNumber = Integer.parseInt(input.substring(5));
+                    tasks[taskNumber - 1].markAsDone();
 
-                tasks[itemCount] = new Todo(description);
-                itemCount++;
+                    System.out.println("Nice! I've marked this task as done:");
+                    System.out.println("  " + tasks[taskNumber - 1]);
+                } else if (input.equals("todo") || input.startsWith("todo ")) {
+                    String description = input.length() > 4
+                            ? input.substring(5)
+                            : "";
 
-                System.out.println("Got it. I've added this task:");
-                System.out.println("  " + tasks[itemCount - 1]);
-                System.out.println("Now you have " + itemCount + " tasks in the list.");
+                    if (description.isBlank()) {
+                        throw new ChimpanziniBananiniException(
+                                "BROTHER WHERE IS THE TASK 💀 Todo cannot be empty.");
+                    }
 
-            } else if (input.startsWith("deadline ")) {
-                String details = input.substring(9);
-                String[] parts = details.split(" /by ", 2);
+                    tasks[itemCount] = new Todo(description);
+                    itemCount++;
 
-                String description = parts[0];
-                String by = parts[1];
+                    System.out.println("Got it. I've added this task:");
+                    System.out.println("  " + tasks[itemCount - 1]);
+                    System.out.println("Now you have " + itemCount + " tasks in the list.");
+                } else if (input.startsWith("deadline ")) {
+                    String details = input.substring(9);
+                    String[] parts = details.split(" /by ", 2);
 
-                tasks[itemCount] = new Deadline(description, by);
-                itemCount++;
+                    String description = parts[0];
+                    String by = parts[1];
 
-                System.out.println("Got it. I've added this task:");
-                System.out.println("  " + tasks[itemCount - 1]);
-                System.out.println("Now you have " + itemCount + " tasks in the list.");
+                    tasks[itemCount] = new Deadline(description, by);
+                    itemCount++;
 
-            } else if (input.startsWith("event ")) {
-                String details = input.substring(6);
+                    System.out.println("Got it. I've added this task:");
+                    System.out.println("  " + tasks[itemCount - 1]);
+                    System.out.println("Now you have " + itemCount + " tasks in the list.");
 
-                String[] fromParts = details.split(" /from ", 2);
-                String description = fromParts[0];
+                } else if (input.startsWith("event ")) {
+                    String details = input.substring(6);
 
-                String[] toParts = fromParts[1].split(" /to ", 2);
-                String from = toParts[0];
-                String to = toParts[1];
+                    String[] fromParts = details.split(" /from ", 2);
+                    String description = fromParts[0];
 
-                tasks[itemCount] = new Event(description, from, to);
-                itemCount++;
+                    String[] toParts = fromParts[1].split(" /to ", 2);
+                    String from = toParts[0];
+                    String to = toParts[1];
 
-                System.out.println("Got it. I've added this task:");
-                System.out.println("  " + tasks[itemCount - 1]);
-                System.out.println("Now you have " + itemCount + " tasks in the list.");
+                    tasks[itemCount] = new Event(description, from, to);
+                    itemCount++;
+
+                    System.out.println("Got it. I've added this task:");
+                    System.out.println("  " + tasks[itemCount - 1]);
+                    System.out.println("Now you have " + itemCount + " tasks in the list.");
+                } else {
+                    throw new ChimpanziniBananiniException(
+                            "Bro is speaking enchantment table 💀 I don't know that command.");
+                }
+            } catch (ChimpanziniBananiniException e) {
+                System.out.println(e.getMessage());
             }
         }
 
