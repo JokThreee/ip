@@ -28,10 +28,46 @@ public class ChimpanziniBananini {
 
                 System.out.println("Nice! I've marked this task as done:");
                 System.out.println("  " + tasks[taskNumber - 1]);
-            } else {
-                tasks[itemCount] = new Task(input);
+            } else if (input.startsWith("todo ")) {
+                String description = input.substring(5);
+
+                tasks[itemCount] = new Todo(description);
                 itemCount++;
-                System.out.println("added: " + input);
+
+                System.out.println("Got it. I've added this task:");
+                System.out.println("  " + tasks[itemCount - 1]);
+                System.out.println("Now you have " + itemCount + " tasks in the list.");
+
+            } else if (input.startsWith("deadline ")) {
+                String details = input.substring(9);
+                String[] parts = details.split(" /by ", 2);
+
+                String description = parts[0];
+                String by = parts[1];
+
+                tasks[itemCount] = new Deadline(description, by);
+                itemCount++;
+
+                System.out.println("Got it. I've added this task:");
+                System.out.println("  " + tasks[itemCount - 1]);
+                System.out.println("Now you have " + itemCount + " tasks in the list.");
+
+            } else if (input.startsWith("event ")) {
+                String details = input.substring(6);
+
+                String[] fromParts = details.split(" /from ", 2);
+                String description = fromParts[0];
+
+                String[] toParts = fromParts[1].split(" /to ", 2);
+                String from = toParts[0];
+                String to = toParts[1];
+
+                tasks[itemCount] = new Event(description, from, to);
+                itemCount++;
+
+                System.out.println("Got it. I've added this task:");
+                System.out.println("  " + tasks[itemCount - 1]);
+                System.out.println("Now you have " + itemCount + " tasks in the list.");
             }
         }
 

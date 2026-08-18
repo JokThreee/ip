@@ -23,8 +23,12 @@ public class Task {
         isDone = false;
     }
 
+    public String getTypeIcon() {
+        return "T";
+    }
+
     @Override
     public String toString() {
-        return "[" + getStatusIcon() + "] " + description;
+        return "[" + getTypeIcon() + "][" + getStatusIcon() + "] " + description;
     }
 }
