@@ -1,3 +1,5 @@
+package chimpanzinibananini.storage;
+
 import java.io.IOException;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
@@ -5,6 +7,12 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+
+import chimpanzinibananini.task.Deadline;
+import chimpanzinibananini.task.Event;
+import chimpanzinibananini.task.Task;
+import chimpanzinibananini.task.TaskList;
+import chimpanzinibananini.task.Todo;
 
 /** Loads tasks from and saves tasks to a data file. */
 public class Storage {

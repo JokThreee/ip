@@ -1,4 +1,9 @@
+package chimpanzinibananini.ui;
+
 import java.util.Scanner;
+
+import chimpanzinibananini.task.Task;
+import chimpanzinibananini.task.TaskList;
 
 /** Handles all console input and output for the chatbot. */
 public class Ui implements AutoCloseable {

@@ -1,5 +1,13 @@
+package chimpanzinibananini.parser;
+
 import java.time.format.DateTimeParseException;
 import java.util.regex.Pattern;
+
+import chimpanzinibananini.exception.ChimpanziniBananiniException;
+import chimpanzinibananini.task.Deadline;
+import chimpanzinibananini.task.Event;
+import chimpanzinibananini.task.Task;
+import chimpanzinibananini.task.Todo;
 
 /** Converts raw user input into commands understood by the chatbot. */
 public class Parser {

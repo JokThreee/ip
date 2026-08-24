@@ -1,5 +1,14 @@
+package chimpanzinibananini;
+
 import java.io.IOException;
 import java.nio.file.Path;
+
+import chimpanzinibananini.exception.ChimpanziniBananiniException;
+import chimpanzinibananini.parser.Parser;
+import chimpanzinibananini.storage.Storage;
+import chimpanzinibananini.task.Task;
+import chimpanzinibananini.task.TaskList;
+import chimpanzinibananini.ui.Ui;
 
 /** Coordinates the components of the ChimpanziniBananini task chatbot. */
 public class ChimpanziniBananini {

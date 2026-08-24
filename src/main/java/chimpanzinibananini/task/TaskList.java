@@ -1,5 +1,9 @@
+package chimpanzinibananini.task;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import chimpanzinibananini.exception.ChimpanziniBananiniException;
 
 /** Owns the collection of tasks and provides task-list operations. */
 public class TaskList {
