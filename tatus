@@ -45,3 +45,24 @@
 [33m6bb6b9f[m .gitignore: add *.iml
 [33m946f3bb[m Import base branch for students to start off
 [33m245013d[m Initial commit
+*   [33m6513be6[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;33mtag: [m[1;33mLevel-8[m[33m)[m Merge Level-8 branch
+[31m|[m[32m\[m  
+[31m|[m * [33m22c3e87[m[33m ([m[1;32mbranch-Level-8[m[33m)[m Add date and time support
+[31m|[m[31m/[m  
+*   [33m5b5ceeb[m[33m ([m[1;33mtag: [m[1;33mLevel-7[m[33m)[m Merge Level-7 branch
+[33m|[m[34m\[m  
+[33m|[m [34m|[m * [33m6ab4f11[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/branch-Level-8[m[33m, [m[1;31morigin/HEAD[m[33m)[m Add date and time support
+[33m|[m [34m|[m[34m/[m  
+[33m|[m * [33mfe92146[m[33m ([m[1;31morigin/branch-Level-7[m[33m, [m[1;32mbranch-Level-7[m[33m)[m Add task data persistence
+[33m|[m[33m/[m  
+* [33m8284e7f[m Document use of AI assistance
+* [33mbaae4f9[m[33m ([m[1;33mtag: [m[1;33mLevel-6[m[33m)[m Add task deletion and use ArrayList
+* [33m450a37c[m[33m ([m[1;33mtag: [m[1;33mLevel-5[m[33m)[m Add error handling with exceptions
+* [33m42ff438[m[33m ([m[1;33mtag: [m[1;33mLevel-4[m[33m)[m Add todo deadline and event task types
+* [33mf4da9fd[m[33m ([m[1;33mtag: [m[1;33mLevel-3[m[33m)[m Add task completion tracking
+* [33mecfb998[m[33m ([m[1;33mtag: [m[1;33mLevel-2[m[33m)[m Add task storage and listing
+* [33medc2cc8[m[33m ([m[1;33mtag: [m[1;33mLevel-1[m[33m)[m Add command echoing
+* [33me320941[m[33m ([m[1;33mtag: [m[1;33mLevel-0[m[33m)[m Add Level-0 chatbot greeting
+* [33m57b1f2d[m Add AGENTS.md and CLAUDE.md
+[35m|[m * [33me38f220[m[33m ([m[1;31morigin/add-gradle-support[m[33m)[m Add Gradle support
+[35m|[m[35m/[m  

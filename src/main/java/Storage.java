@@ -16,12 +16,12 @@ public class Storage {
     }
 
     /** Atomically replaces the data file with the current task list. */
-    public void saveTasks(List<Task> tasks) throws IOException {
+    public void saveTasks(TaskList tasks) throws IOException {
         Path dataDirectory = filePath.getParent();
         Files.createDirectories(dataDirectory);
         Path temporaryFile = Files.createTempFile(dataDirectory, "duke-", ".tmp");
         try {
-            Files.write(temporaryFile, tasks.stream().map(Task::toDataString).toList());
+            Files.write(temporaryFile, tasks.asList().stream().map(Task::toDataString).toList());
             try {
                 Files.move(temporaryFile, filePath, StandardCopyOption.REPLACE_EXISTING,
                         StandardCopyOption.ATOMIC_MOVE);
@@ -34,10 +34,10 @@ public class Storage {
     }
 
     /** Loads and validates tasks, or returns an empty list on first use. */
-    public ArrayList<Task> loadTasks() throws IOException {
+    public TaskList loadTasks() throws IOException {
         ArrayList<Task> tasks = new ArrayList<>();
         if (!Files.exists(filePath)) {
-            return tasks;
+            return new TaskList(tasks);
         }
         if (!Files.isRegularFile(filePath)) {
             throw new IOException(filePath + " is not a regular file");
@@ -54,7 +54,7 @@ public class Storage {
                 throw new IOException("invalid data on line " + (i + 1) + ": " + e.getMessage(), e);
             }
         }
-        return tasks;
+        return new TaskList(tasks);
     }
 
     /** Reconstructs and validates one task from a saved line. */
