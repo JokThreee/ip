@@ -12,7 +12,9 @@ public class Deadline extends Task {
             DateTimeFormatter.ofPattern("uuuu-MM-dd HHmm").withResolverStyle(ResolverStyle.STRICT),
             DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     private static final DateTimeFormatter DATE_INPUT_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE;
-    private static final DateTimeFormatter DISPLAY_FORMAT =
+    private static final DateTimeFormatter DATE_DISPLAY_FORMAT =
+            DateTimeFormatter.ofPattern("MMM d yyyy");
+    private static final DateTimeFormatter DATE_TIME_DISPLAY_FORMAT =
             DateTimeFormatter.ofPattern("MMM d yyyy, h:mma");
 
     private final LocalDateTime by;
@@ -59,6 +61,8 @@ public class Deadline extends Task {
 
     @Override
     public String toString() {
-        return super.toString() + " (by: " + by.format(DISPLAY_FORMAT) + ")";
+        DateTimeFormatter displayFormat = by.toLocalTime().equals(java.time.LocalTime.MIDNIGHT)
+                ? DATE_DISPLAY_FORMAT : DATE_TIME_DISPLAY_FORMAT;
+        return super.toString() + " (by: " + by.format(displayFormat) + ")";
     }
 }
