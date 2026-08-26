@@ -10,7 +10,9 @@ import chimpanzinibananini.task.Task;
 import chimpanzinibananini.task.TaskList;
 import chimpanzinibananini.ui.Ui;
 
-/** Coordinates the components of the ChimpanziniBananini task chatbot. */
+/**
+ * Coordinates the components of the ChimpanziniBananini task chatbot.
+ */
 public class ChimpanziniBananini {
     private static final Path DATA_FILE = Path.of("data", "duke.txt");
 
@@ -18,13 +20,17 @@ public class ChimpanziniBananini {
     private final Storage storage;
     private TaskList tasks;
 
-    /** Creates a chatbot that stores its tasks at the given path. */
+    /**
+     * Creates a chatbot that stores its tasks at the given path.
+     */
     public ChimpanziniBananini(Path filePath) {
         ui = new Ui();
         storage = new Storage(filePath);
     }
 
-    /** Reads and processes commands until the input ends or the user says bye. */
+    /**
+     * Reads and processes commands until the input ends or the user says bye.
+     */
     public void run() {
         ui.showWelcome();
         try {
@@ -56,27 +62,29 @@ public class ChimpanziniBananini {
     /** Executes one parsed command and saves the list after successful changes. */
     private void execute(Parser.ParsedCommand command) throws ChimpanziniBananiniException, IOException {
         switch (command.type()) {
-        case LIST -> ui.showTaskList(tasks);
-        case MARK -> {
-            Task task = tasks.mark(command.taskNumber());
-            storage.saveTasks(tasks);
-            ui.showMarkedTask(task);
-        }
-        case ADD -> {
-            tasks.add(command.task());
-            storage.saveTasks(tasks);
-            ui.showAddedTask(command.task(), tasks.size());
-        }
-        case DELETE -> {
-            Task removedTask = tasks.delete(command.taskNumber());
-            storage.saveTasks(tasks);
-            ui.showDeletedTask(removedTask, tasks.size());
-        }
-        case BYE -> throw new AssertionError("Bye is handled before command execution");
+            case LIST -> ui.showTaskList(tasks);
+            case MARK -> {
+                Task task = tasks.mark(command.taskNumber());
+                storage.saveTasks(tasks);
+                ui.showMarkedTask(task);
+            }
+            case ADD -> {
+                tasks.add(command.task());
+                storage.saveTasks(tasks);
+                ui.showAddedTask(command.task(), tasks.size());
+            }
+            case DELETE -> {
+                Task removedTask = tasks.delete(command.taskNumber());
+                storage.saveTasks(tasks);
+                ui.showDeletedTask(removedTask, tasks.size());
+            }
+            case BYE -> throw new AssertionError("Bye is handled before command execution");
         }
     }
 
-    /** Starts the chatbot using its default data file. */
+    /**
+     * Starts the chatbot using its default data file.
+     */
     public static void main(String[] args) {
         new ChimpanziniBananini(DATA_FILE).run();
     }
