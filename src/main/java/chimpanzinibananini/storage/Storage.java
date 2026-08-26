@@ -14,16 +14,22 @@ import chimpanzinibananini.task.Task;
 import chimpanzinibananini.task.TaskList;
 import chimpanzinibananini.task.Todo;
 
-/** Loads tasks from and saves tasks to a data file. */
+/**
+ * Loads tasks from and saves tasks to a data file.
+ */
 public class Storage {
     private final Path filePath;
 
-    /** Creates a storage manager that uses the given file path. */
+    /**
+     * Creates a storage manager that uses the given file path.
+     */
     public Storage(Path filePath) {
         this.filePath = filePath;
     }
 
-    /** Atomically replaces the data file with the current task list. */
+    /**
+     * Atomically replaces the data file with the current task list.
+     */
     public void saveTasks(TaskList tasks) throws IOException {
         Path dataDirectory = filePath.getParent();
         Files.createDirectories(dataDirectory);
@@ -41,7 +47,9 @@ public class Storage {
         }
     }
 
-    /** Loads and validates tasks, or returns an empty list on first use. */
+    /**
+     * Loads and validates tasks, or returns an empty list on first use.
+     */
     public TaskList loadTasks() throws IOException {
         ArrayList<Task> tasks = new ArrayList<>();
         if (!Files.exists(filePath)) {
@@ -72,10 +80,10 @@ public class Storage {
             throw new IllegalArgumentException("not enough fields");
         }
         int expectedFields = switch (fields.get(0)) {
-        case "T" -> 3;
-        case "D" -> 4;
-        case "E" -> 5;
-        default -> throw new IllegalArgumentException("unknown task type '" + fields.get(0) + "'");
+            case "T" -> 3;
+            case "D" -> 4;
+            case "E" -> 5;
+            default -> throw new IllegalArgumentException("unknown task type '" + fields.get(0) + "'");
         };
         if (fields.size() != expectedFields) {
             throw new IllegalArgumentException("wrong number of fields for task type " + fields.get(0));
@@ -90,10 +98,10 @@ public class Storage {
         }
 
         Task task = switch (fields.get(0)) {
-        case "T" -> new Todo(fields.get(2));
-        case "D" -> new Deadline(fields.get(2), fields.get(3));
-        case "E" -> new Event(fields.get(2), fields.get(3), fields.get(4));
-        default -> throw new AssertionError("Task type was already validated");
+            case "T" -> new Todo(fields.get(2));
+            case "D" -> new Deadline(fields.get(2), fields.get(3));
+            case "E" -> new Event(fields.get(2), fields.get(3), fields.get(4));
+            default -> throw new AssertionError("Task type was already validated");
         };
         if (fields.get(1).equals("1")) {
             task.markAsDone();

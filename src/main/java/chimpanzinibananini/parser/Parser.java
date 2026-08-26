@@ -9,14 +9,23 @@ import chimpanzinibananini.task.Event;
 import chimpanzinibananini.task.Task;
 import chimpanzinibananini.task.Todo;
 
-/** Converts raw user input into commands understood by the chatbot. */
+/**
+ * Converts raw user input into commands understood by the chatbot.
+ */
 public class Parser {
-    /** The operations that the chatbot can execute. */
+    private Parser() {
+    }
+
+    /**
+     * Lists the operations that the chatbot can execute.
+     */
     public enum CommandType {
         LIST, MARK, ADD, DELETE, BYE
     }
 
-    /** A validated command together with any task or task number it needs. */
+    /**
+     * Holds a validated command together with any task or task number it needs.
+     */
     public record ParsedCommand(CommandType type, Task task, int taskNumber) {
         private static ParsedCommand simple(CommandType type) {
             return new ParsedCommand(type, null, 0);
@@ -31,7 +40,9 @@ public class Parser {
         }
     }
 
-    /** Parses and validates one line of user input. */
+    /**
+     * Parses and validates one line of user input.
+     */
     public static ParsedCommand parse(String input) throws ChimpanziniBananiniException {
         String strippedInput = input.strip();
         if (strippedInput.isEmpty()) {
@@ -46,20 +57,20 @@ public class Parser {
         String arguments = commandParts.length == 2 ? commandParts[1].strip() : "";
 
         return switch (command) {
-        case "list" -> {
-            requireNoArguments(arguments, "list");
-            yield ParsedCommand.simple(CommandType.LIST);
-        }
-        case "mark" -> ParsedCommand.withTaskNumber(CommandType.MARK, parseTaskNumber(arguments));
-        case "todo" -> {
-            requireValue(arguments, "BROTHER WHERE IS THE TASK 💀 Todo cannot be empty.");
-            yield ParsedCommand.withTask(new Todo(arguments));
-        }
-        case "deadline" -> ParsedCommand.withTask(parseDeadline(arguments));
-        case "event" -> ParsedCommand.withTask(parseEvent(arguments));
-        case "delete" -> ParsedCommand.withTaskNumber(CommandType.DELETE, parseTaskNumber(arguments));
-        default -> throw new ChimpanziniBananiniException(
-                "Bro is speaking enchantment table 💀 I don't know that command.");
+            case "list" -> {
+                requireNoArguments(arguments, "list");
+                yield ParsedCommand.simple(CommandType.LIST);
+            }
+            case "mark" -> ParsedCommand.withTaskNumber(CommandType.MARK, parseTaskNumber(arguments));
+            case "todo" -> {
+                requireValue(arguments, "BROTHER WHERE IS THE TASK 💀 Todo cannot be empty.");
+                yield ParsedCommand.withTask(new Todo(arguments));
+            }
+            case "deadline" -> ParsedCommand.withTask(parseDeadline(arguments));
+            case "event" -> ParsedCommand.withTask(parseEvent(arguments));
+            case "delete" -> ParsedCommand.withTaskNumber(CommandType.DELETE, parseTaskNumber(arguments));
+            default -> throw new ChimpanziniBananiniException(
+                    "Bro is speaking enchantment table 💀 I don't know that command.");
         };
     }
 

@@ -5,49 +5,67 @@ import java.util.List;
 
 import chimpanzinibananini.exception.ChimpanziniBananiniException;
 
-/** Owns the collection of tasks and provides task-list operations. */
+/**
+ * Owns the collection of tasks and provides task-list operations.
+ */
 public class TaskList {
     private final ArrayList<Task> tasks;
 
-    /** Creates an empty task list. */
+    /**
+     * Creates an empty task list.
+     */
     public TaskList() {
         this(new ArrayList<>());
     }
 
-    /** Creates a task list containing the loaded tasks. */
+    /**
+     * Creates a task list containing the loaded tasks.
+     */
     public TaskList(List<Task> tasks) {
         this.tasks = new ArrayList<>(tasks);
     }
 
-    /** Adds a task to the end of the list. */
+    /**
+     * Adds a task to the end of the list.
+     */
     public void add(Task task) {
         tasks.add(task);
     }
 
-    /** Marks the given one-based task number and returns that task. */
+    /**
+     * Marks the given one-based task number and returns that task.
+     */
     public Task mark(int taskNumber) throws ChimpanziniBananiniException {
         Task task = getByTaskNumber(taskNumber);
         task.markAsDone();
         return task;
     }
 
-    /** Deletes and returns the task at the given one-based task number. */
+    /**
+     * Deletes and returns the task at the given one-based task number.
+     */
     public Task delete(int taskNumber) throws ChimpanziniBananiniException {
         validateTaskNumber(taskNumber);
         return tasks.remove(taskNumber - 1);
     }
 
-    /** Returns the task at a zero-based index for displaying the list. */
+    /**
+     * Returns the task at a zero-based index for displaying the list.
+     */
     public Task get(int index) {
         return tasks.get(index);
     }
 
-    /** Returns the number of tasks in the list. */
+    /**
+     * Returns the number of tasks in the list.
+     */
     public int size() {
         return tasks.size();
     }
 
-    /** Provides a read-only view for persistence. */
+    /**
+     * Returns a read-only view of the tasks for persistence.
+     */
     public List<Task> asList() {
         return List.copyOf(tasks);
     }

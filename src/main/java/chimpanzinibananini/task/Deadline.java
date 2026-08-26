@@ -7,7 +7,9 @@ import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.util.List;
 
-/** A task that must be completed by a particular date and time. */
+/**
+ * Represents a task that must be completed by a particular date and time.
+ */
 public class Deadline extends Task {
     private static final List<DateTimeFormatter> DATE_TIME_INPUT_FORMATS = List.of(
             DateTimeFormatter.ofPattern("d/M/uuuu HHmm").withResolverStyle(ResolverStyle.STRICT),
@@ -21,10 +23,16 @@ public class Deadline extends Task {
 
     private final LocalDateTime by;
 
+    /**
+     * Creates an incomplete deadline by parsing the specified date and time.
+     */
     public Deadline(String description, String by) {
         this(description, parseDateTime(by));
     }
 
+    /**
+     * Creates an incomplete deadline with the specified date and time.
+     */
     public Deadline(String description, LocalDateTime by) {
         super(description);
         this.by = by;

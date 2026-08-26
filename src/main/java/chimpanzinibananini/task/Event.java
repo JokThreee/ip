@@ -1,9 +1,15 @@
 package chimpanzinibananini.task;
 
+/**
+ * Represents a task that occurs over a specified period.
+ */
 public class Event extends Task {
     private String from;
     private String to;
 
+    /**
+     * Creates an incomplete event with the specified description, start, and end values.
+     */
     public Event(String description, String from, String to) {
         super(description);
         this.from = from;
