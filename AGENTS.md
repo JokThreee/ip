@@ -38,6 +38,8 @@ Maintain JUnit tests for approximately the top 50% highest-value methods in the 
 
 ## Git
 
+For every commit preparation, proposal, review, or creation in this repository, load and follow the project-specific `$seedu-git-standard` skill at `.agents/skills/seedu-git-standard/SKILL.md`. Treat its commit-message rules as mandatory for all future commits, subject only to explicit user instructions that take precedence.
+
 Use lightweight tags unless the user requests an annotated tag.
 When proposing or creating a commit message, include enough detail to explain the rationale for the change.
 Do not commit or push unless explicitly asked.
