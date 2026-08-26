@@ -34,6 +34,14 @@ class ParserTest {
     }
 
     @Test
+    void parse_findCommand_returnsKeyword() throws ChimpanziniBananiniException {
+        ParsedCommand find = Parser.parse("  find   read book  ");
+
+        assertEquals(CommandType.FIND, find.type());
+        assertEquals("read book", find.keyword());
+    }
+
+    @Test
     void parse_taskCommands_returnsCorrectTaskTypes() throws ChimpanziniBananiniException {
         assertInstanceOf(Todo.class, Parser.parse("todo read book").task());
         assertInstanceOf(Deadline.class,
@@ -75,6 +83,11 @@ class ParserTest {
                 () -> Parser.parse("deadline return book"));
         assertThrows(ChimpanziniBananiniException.class,
                 () -> Parser.parse("event meeting /from 2pm"));
+    }
+
+    @Test
+    void parse_findCommandWithMissingKeyword_throwsChatbotException() {
+        assertThrows(ChimpanziniBananiniException.class, () -> Parser.parse("find"));
     }
 
     @Test

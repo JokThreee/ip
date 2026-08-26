@@ -72,6 +72,7 @@ public class ChimpanziniBananini {
             storage.saveTasks(tasks);
             ui.showDeletedTask(removedTask, tasks.size());
         }
+        case FIND -> ui.showFoundTasks(tasks.find(command.keyword()));
         case BYE -> throw new AssertionError("Bye is handled before command execution");
         }
     }
