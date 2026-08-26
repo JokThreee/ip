@@ -80,6 +80,25 @@ class TaskListTest {
     }
 
     @Test
+    void find_keywordInDescriptions_returnsMatchingTasksInOriginalOrder() {
+        Todo firstMatch = new Todo("read book");
+        Todo nonMatch = new Todo("write essay");
+        Todo secondMatch = new Todo("return book");
+        TaskList tasks = new TaskList(List.of(firstMatch, nonMatch, secondMatch));
+
+        List<Task> matches = tasks.find("book");
+
+        assertEquals(List.of(firstMatch, secondMatch), matches);
+    }
+
+    @Test
+    void find_keywordNotInDescriptions_returnsEmptyList() {
+        TaskList tasks = new TaskList(List.of(new Todo("read book")));
+
+        assertEquals(List.of(), tasks.find("essay"));
+    }
+
+    @Test
     void asList_callerAttemptsModification_throwsUnsupportedOperationException() {
         TaskList tasks = new TaskList(List.of(new Todo("read book")));
 

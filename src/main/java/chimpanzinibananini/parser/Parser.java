@@ -20,23 +20,25 @@ public class Parser {
      * Lists the operations that the chatbot can execute.
      */
     public enum CommandType {
-        LIST, MARK, ADD, DELETE, BYE
+        LIST, MARK, ADD, DELETE, FIND, BYE
     }
 
-    /**
-     * Holds a validated command together with any task or task number it needs.
-     */
-    public record ParsedCommand(CommandType type, Task task, int taskNumber) {
+    /** A validated command together with any task or task number it needs. */
+    public record ParsedCommand(CommandType type, Task task, int taskNumber, String keyword) {
         private static ParsedCommand simple(CommandType type) {
-            return new ParsedCommand(type, null, 0);
+            return new ParsedCommand(type, null, 0, null);
         }
 
         private static ParsedCommand withTask(Task task) {
-            return new ParsedCommand(CommandType.ADD, task, 0);
+            return new ParsedCommand(CommandType.ADD, task, 0, null);
         }
 
         private static ParsedCommand withTaskNumber(CommandType type, int taskNumber) {
-            return new ParsedCommand(type, null, taskNumber);
+            return new ParsedCommand(type, null, taskNumber, null);
+        }
+
+        private static ParsedCommand withKeyword(String keyword) {
+            return new ParsedCommand(CommandType.FIND, null, 0, keyword);
         }
     }
 
@@ -57,20 +59,24 @@ public class Parser {
         String arguments = commandParts.length == 2 ? commandParts[1].strip() : "";
 
         return switch (command) {
-            case "list" -> {
-                requireNoArguments(arguments, "list");
-                yield ParsedCommand.simple(CommandType.LIST);
-            }
-            case "mark" -> ParsedCommand.withTaskNumber(CommandType.MARK, parseTaskNumber(arguments));
-            case "todo" -> {
-                requireValue(arguments, "BROTHER WHERE IS THE TASK 💀 Todo cannot be empty.");
-                yield ParsedCommand.withTask(new Todo(arguments));
-            }
-            case "deadline" -> ParsedCommand.withTask(parseDeadline(arguments));
-            case "event" -> ParsedCommand.withTask(parseEvent(arguments));
-            case "delete" -> ParsedCommand.withTaskNumber(CommandType.DELETE, parseTaskNumber(arguments));
-            default -> throw new ChimpanziniBananiniException(
-                    "Bro is speaking enchantment table 💀 I don't know that command.");
+        case "list" -> {
+            requireNoArguments(arguments, "list");
+            yield ParsedCommand.simple(CommandType.LIST);
+        }
+        case "mark" -> ParsedCommand.withTaskNumber(CommandType.MARK, parseTaskNumber(arguments));
+        case "todo" -> {
+            requireValue(arguments, "BROTHER WHERE IS THE TASK 💀 Todo cannot be empty.");
+            yield ParsedCommand.withTask(new Todo(arguments));
+        }
+        case "deadline" -> ParsedCommand.withTask(parseDeadline(arguments));
+        case "event" -> ParsedCommand.withTask(parseEvent(arguments));
+        case "delete" -> ParsedCommand.withTaskNumber(CommandType.DELETE, parseTaskNumber(arguments));
+        case "find" -> {
+            requireValue(arguments, "Please provide a keyword.");
+            yield ParsedCommand.withKeyword(arguments);
+        }
+        default -> throw new ChimpanziniBananiniException(
+                "Bro is speaking enchantment table 💀 I don't know that command.");
         };
     }
 

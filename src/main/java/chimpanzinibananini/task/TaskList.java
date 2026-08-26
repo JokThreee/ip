@@ -48,10 +48,14 @@ public class TaskList {
         validateTaskNumber(taskNumber);
         return tasks.remove(taskNumber - 1);
     }
+    /** Returns tasks whose descriptions contain the given keyword. */
+    public List<Task> find(String keyword) {
+        return tasks.stream()
+                .filter(task -> task.getDescription().contains(keyword))
+                .toList();
+    }
 
-    /**
-     * Returns the task at a zero-based index for displaying the list.
-     */
+    /** Returns the task at a zero-based index for displaying the list. */
     public Task get(int index) {
         return tasks.get(index);
     }

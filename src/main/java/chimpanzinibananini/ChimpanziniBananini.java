@@ -62,23 +62,24 @@ public class ChimpanziniBananini {
     /** Executes one parsed command and saves the list after successful changes. */
     private void execute(Parser.ParsedCommand command) throws ChimpanziniBananiniException, IOException {
         switch (command.type()) {
-            case LIST -> ui.showTaskList(tasks);
-            case MARK -> {
-                Task task = tasks.mark(command.taskNumber());
-                storage.saveTasks(tasks);
-                ui.showMarkedTask(task);
-            }
-            case ADD -> {
-                tasks.add(command.task());
-                storage.saveTasks(tasks);
-                ui.showAddedTask(command.task(), tasks.size());
-            }
-            case DELETE -> {
-                Task removedTask = tasks.delete(command.taskNumber());
-                storage.saveTasks(tasks);
-                ui.showDeletedTask(removedTask, tasks.size());
-            }
-            case BYE -> throw new AssertionError("Bye is handled before command execution");
+        case LIST -> ui.showTaskList(tasks);
+        case MARK -> {
+            Task task = tasks.mark(command.taskNumber());
+            storage.saveTasks(tasks);
+            ui.showMarkedTask(task);
+        }
+        case ADD -> {
+            tasks.add(command.task());
+            storage.saveTasks(tasks);
+            ui.showAddedTask(command.task(), tasks.size());
+        }
+        case DELETE -> {
+            Task removedTask = tasks.delete(command.taskNumber());
+            storage.saveTasks(tasks);
+            ui.showDeletedTask(removedTask, tasks.size());
+        }
+        case FIND -> ui.showFoundTasks(tasks.find(command.keyword()));
+        case BYE -> throw new AssertionError("Bye is handled before command execution");
         }
     }
 
