@@ -14,11 +14,12 @@ import chimpanzinibananini.ui.Ui;
  * Coordinates the components of the ChimpanziniBananini task chatbot.
  */
 public class ChimpanziniBananini {
-    private static final Path DATA_FILE = Path.of("data", "duke.txt");
+    public static final Path DATA_FILE = Path.of("data", "duke.txt");
 
     private final Ui ui;
     private final Storage storage;
     private TaskList tasks;
+    private String loadingError;
 
     /**
      * Creates a chatbot that stores its tasks at the given path.
@@ -26,6 +27,12 @@ public class ChimpanziniBananini {
     public ChimpanziniBananini(Path filePath) {
         ui = new Ui();
         storage = new Storage(filePath);
+        try {
+            tasks = storage.loadTasks();
+        } catch (IOException e) {
+            tasks = new TaskList();
+            loadingError = e.getMessage();
+        }
     }
 
     /**
@@ -35,6 +42,7 @@ public class ChimpanziniBananini {
         ui.showWelcome();
         try {
             tasks = storage.loadTasks();
+            loadingError = null;
         } catch (IOException e) {
             ui.showLoadingError(e.getMessage());
             ui.close();
@@ -42,44 +50,83 @@ public class ChimpanziniBananini {
         }
         try (ui) {
             while (ui.hasNextCommand()) {
-                try {
-                    Parser.ParsedCommand command = Parser.parse(ui.readCommand());
-                    if (command.type() == Parser.CommandType.BYE) {
-                        break;
-                    }
-                    execute(command);
-                } catch (ChimpanziniBananiniException e) {
-                    ui.showError(e.getMessage());
-                } catch (IOException e) {
-                    ui.showSavingError(e.getMessage());
+                String input = ui.readCommand();
+                String response = getResponse(input);
+                ui.showResponse(response);
+                if (isBye(input)) {
                     break;
                 }
             }
         }
-        ui.showGoodbye();
+    }
+
+    /**
+     * Processes one command and returns the chatbot's response.
+     */
+    public String getResponse(String input) {
+        if (loadingError != null) {
+            return "I couldn't load the task file: " + loadingError;
+        }
+        try {
+            return execute(Parser.parse(input));
+        } catch (ChimpanziniBananiniException e) {
+            return e.getMessage();
+        } catch (IOException e) {
+            return "I couldn't save your tasks: " + e.getMessage();
+        }
     }
 
     /** Executes one parsed command and saves the list after successful changes. */
-    private void execute(Parser.ParsedCommand command) throws ChimpanziniBananiniException, IOException {
-        switch (command.type()) {
-        case LIST -> ui.showTaskList(tasks);
+    private String execute(Parser.ParsedCommand command) throws ChimpanziniBananiniException, IOException {
+        return switch (command.type()) {
+        case LIST -> formatTaskList(tasks);
         case MARK -> {
             Task task = tasks.mark(command.taskNumber());
             storage.saveTasks(tasks);
-            ui.showMarkedTask(task);
+            yield "Nice! I've marked this task as done:\n  " + task;
         }
         case ADD -> {
             tasks.add(command.task());
             storage.saveTasks(tasks);
-            ui.showAddedTask(command.task(), tasks.size());
+            yield "Got it. I've added this task:\n  " + command.task()
+                    + "\nNow you have " + tasks.size() + " tasks in the list.";
         }
         case DELETE -> {
             Task removedTask = tasks.delete(command.taskNumber());
             storage.saveTasks(tasks);
-            ui.showDeletedTask(removedTask, tasks.size());
+            yield "Noted. I've removed this task:\n  " + removedTask
+                    + "\nNow you have " + tasks.size() + " tasks in the list.";
         }
-        case FIND -> ui.showFoundTasks(tasks.find(command.keyword()));
-        case BYE -> throw new AssertionError("Bye is handled before command execution");
+        case FIND -> formatFoundTasks(command);
+        case BYE -> "Tung tung tung sahur... I'm outta here 💀";
+        };
+    }
+
+    /** Formats all tasks using their one-based task numbers. */
+    private String formatTaskList(TaskList taskList) {
+        StringBuilder response = new StringBuilder();
+        for (int i = 0; i < taskList.size(); i++) {
+            if (i > 0) {
+                response.append('\n');
+            }
+            response.append(i + 1).append(". ").append(taskList.get(i));
+        }
+        return response.isEmpty() ? "Your task list is empty." : response.toString();
+    }
+
+    /** Formats tasks matching a find command. */
+    private String formatFoundTasks(Parser.ParsedCommand command) {
+        TaskList matchingTasks = new TaskList(tasks.find(command.keyword()));
+        String formattedTasks = formatTaskList(matchingTasks);
+        return "Here are the matching tasks in your list:\n" + formattedTasks;
+    }
+
+    /** Returns whether an input is a valid bye command. */
+    private boolean isBye(String input) {
+        try {
+            return Parser.parse(input).type() == Parser.CommandType.BYE;
+        } catch (ChimpanziniBananiniException e) {
+            return false;
         }
     }
 

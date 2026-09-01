@@ -110,6 +110,13 @@ public class Ui implements AutoCloseable {
     }
 
     /**
+     * Displays a response produced by the chatbot.
+     */
+    public void showResponse(String response) {
+        System.out.println(response);
+    }
+
+    /**
      * Releases the scanner used for console input.
      */
     @Override
