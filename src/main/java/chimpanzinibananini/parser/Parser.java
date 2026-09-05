@@ -26,14 +26,19 @@ public class Parser {
     /** A validated command together with any task or task number it needs. */
     public record ParsedCommand(CommandType type, Task task, int taskNumber, String keyword) {
         private static ParsedCommand simple(CommandType type) {
+            assert type == CommandType.LIST || type == CommandType.BYE
+                    : "Only LIST and BYE commands have no payload";
             return new ParsedCommand(type, null, 0, null);
         }
 
         private static ParsedCommand withTask(Task task) {
+            assert task != null : "An ADD command must carry a task constructed by the parser";
             return new ParsedCommand(CommandType.ADD, task, 0, null);
         }
 
         private static ParsedCommand withTaskNumber(CommandType type, int taskNumber) {
+            assert type == CommandType.MARK || type == CommandType.DELETE
+                    : "Only MARK and DELETE commands use a task number";
             return new ParsedCommand(type, null, taskNumber, null);
         }
 
