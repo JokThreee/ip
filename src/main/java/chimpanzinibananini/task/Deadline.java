@@ -59,6 +59,10 @@ public class Deadline extends Task {
         }
     }
 
+    public LocalDateTime getBy() {
+        return by;
+    }
+
     @Override
     public String getTypeIcon() {
         return "D";

@@ -2,6 +2,8 @@ package chimpanzinibananini;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.Clock;
+import java.time.LocalDateTime;
 
 import chimpanzinibananini.exception.ChimpanziniBananiniException;
 import chimpanzinibananini.parser.Parser;
@@ -18,6 +20,7 @@ public class ChimpanziniBananini {
 
     private final Ui ui;
     private final Storage storage;
+    private final Clock clock;
     private TaskList tasks;
     private String loadingError;
 
@@ -25,6 +28,14 @@ public class ChimpanziniBananini {
      * Creates a chatbot that stores its tasks at the given path.
      */
     public ChimpanziniBananini(Path filePath) {
+        this(filePath, Clock.systemDefaultZone());
+    }
+
+    /**
+     * Creates a chatbot with the given storage path and clock for reminder time comparisons.
+     */
+    public ChimpanziniBananini(Path filePath, Clock clock) {
+        this.clock = clock;
         ui = new Ui();
         storage = new Storage(filePath);
         try {
@@ -80,6 +91,13 @@ public class ChimpanziniBananini {
     private String execute(Parser.ParsedCommand command) throws ChimpanziniBananiniException, IOException {
         return switch (command.type()) {
         case LIST -> formatTaskList(tasks);
+        case REMINDERS -> {
+            LocalDateTime now = LocalDateTime.now(clock);
+            TaskList upcomingDeadlines = new TaskList(tasks.getUpcomingDeadlines(now));
+            yield upcomingDeadlines.size() == 0
+                    ? "You have no upcoming deadlines in the next 7 days."
+                    : "Here are your upcoming deadlines:\n" + formatTaskList(upcomingDeadlines);
+        }
         case MARK -> {
             Task task = tasks.mark(command.taskNumber());
             storage.saveTasks(tasks);

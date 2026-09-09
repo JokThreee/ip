@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +14,61 @@ import chimpanzinibananini.exception.ChimpanziniBananiniException;
 
 /** Tests task-list ownership and one-based task operations. */
 class TaskListTest {
+
+    private static final LocalDateTime NOW = LocalDateTime.of(2026, 9, 9, 15, 0);
+
+    @Test
+    void getUpcomingDeadlines_windowBoundaries_includesOnlyInclusiveWindow() {
+        Deadline start = new Deadline("now", NOW);
+        Deadline afterStart = new Deadline("after start", NOW.plusNanos(1));
+        Deadline inside = new Deadline("inside", NOW.plusDays(3));
+        Deadline beforeEnd = new Deadline("before end", NOW.plusDays(7).minusNanos(1));
+        Deadline end = new Deadline("end", NOW.plusDays(7));
+        TaskList tasks = new TaskList(List.of(
+                new Deadline("overdue", NOW.minusDays(1)),
+                new Deadline("before start", NOW.minusNanos(1)), start, afterStart, inside, beforeEnd, end,
+                new Deadline("after end", NOW.plusDays(7).plusNanos(1)),
+                new Deadline("beyond", NOW.plusDays(8))));
+
+        assertEquals(List.of(start, afterStart, inside, beforeEnd, end), tasks.getUpcomingDeadlines(NOW));
+    }
+
+    @Test
+    void getUpcomingDeadlines_ineligibleTasks_returnsEmptyList() {
+        Deadline completed = new Deadline("completed", NOW.plusDays(1));
+        completed.markAsDone();
+        TaskList tasks = new TaskList(List.of(completed, new Todo("todo"),
+                new Event("event", NOW.toString(), NOW.plusDays(1).toString())));
+
+        assertEquals(List.of(), tasks.getUpcomingDeadlines(NOW));
+        assertEquals(List.of(), new TaskList().getUpcomingDeadlines(NOW));
+    }
+
+    @Test
+    void getUpcomingDeadlines_unsortedTasks_sortsStablyWithoutMutatingTasks() {
+        Deadline late = new Deadline("late", NOW.plusDays(5));
+        Deadline firstTie = new Deadline("first tie", NOW.plusDays(2));
+        Deadline early = new Deadline("early", NOW.plusDays(1));
+        Deadline secondTie = new Deadline("second tie", NOW.plusDays(2));
+        Deadline completed = new Deadline("completed", NOW);
+        completed.markAsDone();
+        List<Task> original = List.of(late, firstTie, completed, early, secondTie);
+        TaskList tasks = new TaskList(original);
+        List<String> originalData = tasks.asList().stream().map(Task::toDataString).toList();
+
+        assertEquals(List.of(early, firstTie, secondTie, late), tasks.getUpcomingDeadlines(NOW));
+        assertEquals(original, tasks.asList());
+        assertEquals(originalData, tasks.asList().stream().map(Task::toDataString).toList());
+    }
+
+    @Test
+    void getUpcomingDeadlines_dateOnlyToday_preservesMidnightSemantics() {
+        Deadline today = new Deadline("today", "2026-09-09");
+        Deadline tomorrow = new Deadline("tomorrow", "2026-09-10");
+        TaskList tasks = new TaskList(List.of(today, tomorrow));
+
+        assertEquals(List.of(tomorrow), tasks.getUpcomingDeadlines(NOW));
+    }
 
     @Test
     void constructor_sourceListLaterModified_keepsIndependentCopy() {
