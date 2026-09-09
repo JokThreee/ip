@@ -1,6 +1,8 @@
 package chimpanzinibananini.task;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import chimpanzinibananini.exception.ChimpanziniBananiniException;
@@ -52,6 +54,22 @@ public class TaskList {
     public List<Task> find(String keyword) {
         return tasks.stream()
                 .filter(task -> task.getDescription().contains(keyword))
+                .toList();
+    }
+
+    /**
+     * Returns incomplete deadlines from now through seven local days later, inclusive.
+     * Orders matches by due time, preserving task-list order for ties without changing this list.
+     */
+    public List<Task> getUpcomingDeadlines(LocalDateTime now) {
+        LocalDateTime windowEnd = now.plusDays(7);
+        return tasks.stream()
+                .filter(task -> task instanceof Deadline && !task.isDone())
+                .map(task -> (Deadline) task)
+                .filter(deadline -> !deadline.getBy().isBefore(now)
+                        && !deadline.getBy().isAfter(windowEnd))
+                .sorted(Comparator.comparing(Deadline::getBy))
+                .<Task>map(deadline -> deadline)
                 .toList();
     }
 

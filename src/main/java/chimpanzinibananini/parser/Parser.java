@@ -20,7 +20,7 @@ public class Parser {
      * Lists the operations that the chatbot can execute.
      */
     public enum CommandType {
-        LIST, MARK, ADD, DELETE, FIND, BYE
+        LIST, MARK, ADD, DELETE, FIND, REMINDERS, BYE
     }
 
     /** A validated command together with any task or task number it needs. */
@@ -69,6 +69,10 @@ public class Parser {
             yield ParsedCommand.simple(CommandType.LIST);
         }
         case "mark" -> ParsedCommand.withTaskNumber(CommandType.MARK, parseTaskNumber(arguments));
+        case "reminders" -> {
+            requireNoArguments(arguments, "reminders");
+            yield ParsedCommand.simple(CommandType.REMINDERS);
+        }
         case "todo" -> {
             requireValue(arguments, "BROTHER WHERE IS THE TASK 💀 Todo cannot be empty.");
             yield ParsedCommand.withTask(new Todo(arguments));

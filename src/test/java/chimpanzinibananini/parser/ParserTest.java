@@ -17,6 +17,23 @@ import chimpanzinibananini.task.Todo;
 class ParserTest {
 
     @Test
+    void parse_remindersCommand_preservesWhitespaceAndCaseRules() throws ChimpanziniBananiniException {
+        assertEquals(CommandType.REMINDERS, Parser.parse("reminders").type());
+        assertEquals(CommandType.REMINDERS, Parser.parse("  reminders\t  ").type());
+        assertThrows(ChimpanziniBananiniException.class, () -> Parser.parse("Reminders"));
+        assertThrows(ChimpanziniBananiniException.class, () -> Parser.parse("remind"));
+    }
+
+    @Test
+    void parse_remindersWithArguments_rejectsArguments() {
+        for (String input : new String[] {"reminders 7", "reminders /within 7d", "reminders today"}) {
+            ChimpanziniBananiniException exception = assertThrows(
+                    ChimpanziniBananiniException.class, () -> Parser.parse(input));
+            assertEquals("The reminders command takes no arguments.", exception.getMessage());
+        }
+    }
+
+    @Test
     void parse_simpleCommands_returnsExpectedCommandTypes() throws ChimpanziniBananiniException {
         assertEquals(CommandType.LIST, Parser.parse("list").type());
         assertEquals(CommandType.BYE, Parser.parse("bye").type());
