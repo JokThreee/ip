@@ -76,6 +76,24 @@ public class Storage {
     /** Reconstructs and validates one task from a saved line. */
     private Task parseStoredTask(String line) {
         List<String> fields = splitStoredFields(line);
+        validateStoredFields(fields);
+
+        Task task = switch (fields.get(0)) {
+            case "T" -> new Todo(fields.get(2));
+            case "D" -> new Deadline(fields.get(2), fields.get(3));
+            case "E" -> new Event(fields.get(2), fields.get(3), fields.get(4));
+            default -> throw new AssertionError("Task type was already validated");
+        };
+        if (fields.get(1).equals("1")) {
+            task.markAsDone();
+        }
+        return task;
+    }
+
+    /**
+     * Validates the stored task's type, field count, completion status, and required values.
+     */
+    private void validateStoredFields(List<String> fields) {
         if (fields.size() < 3) {
             throw new IllegalArgumentException("not enough fields");
         }
@@ -94,17 +112,6 @@ public class Storage {
         if (fields.stream().skip(2).anyMatch(String::isBlank)) {
             throw new IllegalArgumentException("task fields cannot be blank");
         }
-
-        Task task = switch (fields.get(0)) {
-            case "T" -> new Todo(fields.get(2));
-            case "D" -> new Deadline(fields.get(2), fields.get(3));
-            case "E" -> new Event(fields.get(2), fields.get(3), fields.get(4));
-            default -> throw new AssertionError("Task type was already validated");
-        };
-        if (fields.get(1).equals("1")) {
-            task.markAsDone();
-        }
-        return task;
     }
 
     /** Splits a stored line while decoding escaped separators and control characters. */
