@@ -91,10 +91,8 @@ public class Storage {
         if (!fields.get(1).equals("0") && !fields.get(1).equals("1")) {
             throw new IllegalArgumentException("completion status must be 0 or 1");
         }
-        for (int i = 2; i < fields.size(); i++) {
-            if (fields.get(i).isBlank()) {
-                throw new IllegalArgumentException("task fields cannot be blank");
-            }
+        if (fields.stream().skip(2).anyMatch(String::isBlank)) {
+            throw new IllegalArgumentException("task fields cannot be blank");
         }
 
         Task task = switch (fields.get(0)) {
