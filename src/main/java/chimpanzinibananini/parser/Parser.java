@@ -26,7 +26,9 @@ public class Parser {
     /** A validated command together with any task or task number it needs. */
     public record ParsedCommand(CommandType type, Task task, int taskNumber, String keyword) {
         private static ParsedCommand simple(CommandType type) {
-            assert type == CommandType.LIST || type == CommandType.BYE || type == CommandType.REMINDERS
+            assert type == CommandType.LIST
+                    || type == CommandType.BYE
+                    || type == CommandType.REMINDERS
                     : "Only LIST, BYE, and REMINDERS commands have no payload";
             return new ParsedCommand(type, null, 0, null);
         }
