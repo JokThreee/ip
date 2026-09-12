@@ -5,6 +5,7 @@ import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class Storage {
      * Atomically replaces the data file with the current task list.
      */
     public void saveTasks(TaskList tasks) throws IOException {
-        Path dataDirectory = filePath.getParent();
+        Path dataDirectory = filePath.toAbsolutePath().getParent();
         Files.createDirectories(dataDirectory);
         Path temporaryFile = Files.createTempFile(dataDirectory, "duke-", ".tmp");
         try {
@@ -52,7 +53,7 @@ public class Storage {
      */
     public TaskList loadTasks() throws IOException {
         ArrayList<Task> tasks = new ArrayList<>();
-        if (!Files.exists(filePath)) {
+        if (Files.notExists(filePath)) {
             return new TaskList(tasks);
         }
         if (!Files.isRegularFile(filePath)) {
@@ -66,7 +67,7 @@ public class Storage {
             }
             try {
                 tasks.add(parseStoredTask(lines.get(i)));
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException | DateTimeParseException e) {
                 throw new IOException("invalid data on line " + (i + 1) + ": " + e.getMessage(), e);
             }
         }

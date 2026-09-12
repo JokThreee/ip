@@ -99,19 +99,32 @@ public class ChimpanziniBananini {
                     : "Here are your upcoming deadlines:\n" + formatTaskList(upcomingDeadlines);
         }
         case MARK -> {
+            boolean wasDone = command.taskNumber() >= 1 && command.taskNumber() <= tasks.size()
+                    && tasks.get(command.taskNumber() - 1).isDone();
             Task task = tasks.mark(command.taskNumber());
-            storage.saveTasks(tasks);
+            try {
+                storage.saveTasks(tasks);
+            } catch (IOException e) {
+                if (!wasDone) {
+                    task.markAsNotDone();
+                }
+                throw e;
+            }
             yield "Nice! I've marked this task as done:\n  " + task;
         }
         case ADD -> {
-            tasks.add(command.task());
-            storage.saveTasks(tasks);
+            TaskList updatedTasks = new TaskList(tasks.asList());
+            updatedTasks.add(command.task());
+            storage.saveTasks(updatedTasks);
+            tasks = updatedTasks;
             yield "Got it. I've added this task:\n  " + command.task()
                     + "\nNow you have " + tasks.size() + " tasks in the list.";
         }
         case DELETE -> {
-            Task removedTask = tasks.delete(command.taskNumber());
-            storage.saveTasks(tasks);
+            TaskList updatedTasks = new TaskList(tasks.asList());
+            Task removedTask = updatedTasks.delete(command.taskNumber());
+            storage.saveTasks(updatedTasks);
+            tasks = updatedTasks;
             yield "Noted. I've removed this task:\n  " + removedTask
                     + "\nNow you have " + tasks.size() + " tasks in the list.";
         }
