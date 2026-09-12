@@ -24,6 +24,58 @@ class ChimpanziniBananiniTest {
     private Path temporaryDirectory;
 
     @Test
+    void getResponse_invalidStoredDeadline_reportsLoadingErrorAndPreservesFile() throws IOException {
+        Path dataFile = temporaryDirectory.resolve("duke.txt");
+        String contents = "T | 0 | valid\nD | 0 | return book | 2023-02-29\n";
+        Files.writeString(dataFile, contents);
+        ChimpanziniBananini chatbot = new ChimpanziniBananini(dataFile);
+
+        assertEquals("I couldn't load the task file: invalid data on line 2: "
+                + "Use yyyy-MM-dd or d/M/yyyy HHmm (for example, 2/12/2019 1800)",
+                chatbot.getResponse("todo new task"));
+        assertEquals(contents, Files.readString(dataFile));
+    }
+
+    @Test
+    void getResponse_failedSave_preservesTasksAndAllowsRetry() throws IOException {
+        Path dataFile = temporaryDirectory.resolve("duke.txt");
+        String contents = "T | 0 | first\nT | 1 | second\nT | 0 | third\n";
+        for (String command : new String[] {"todo new task", "delete 2", "mark 1", "mark 2"}) {
+            Files.writeString(dataFile, contents);
+            ChimpanziniBananini chatbot = new ChimpanziniBananini(dataFile);
+            String originalList = chatbot.getResponse("list");
+            // A nonempty directory reliably prevents replacement on every supported operating system.
+            Files.delete(dataFile);
+            Files.createDirectory(dataFile);
+            Path blocker = dataFile.resolve("blocker.txt");
+            Files.writeString(blocker, "keep");
+
+            assertTrue(chatbot.getResponse(command).startsWith("I couldn't save your tasks: "));
+            assertEquals(originalList, chatbot.getResponse("list"));
+            assertEquals("keep", Files.readString(blocker));
+
+            Files.delete(blocker);
+            Files.delete(dataFile);
+            assertFalse(chatbot.getResponse(command).startsWith("I couldn't save your tasks: "));
+            assertEquals(chatbot.getResponse("list"), new ChimpanziniBananini(dataFile).getResponse("list"));
+            if (command.startsWith("todo")) {
+                assertEquals(originalList + "\n4. [T][ ] new task", chatbot.getResponse("list"));
+            }
+        }
+    }
+
+    @Test
+    void getResponse_markOutsideList_returnsValidationError() {
+        ChimpanziniBananini chatbot = new ChimpanziniBananini(temporaryDirectory.resolve("duke.txt"));
+        chatbot.getResponse("todo first");
+
+        for (String command : new String[] {"mark 0", "mark -1", "mark 2", "mark 2147483647"}) {
+            assertTrue(chatbot.getResponse(command).startsWith("That task number does not exist"));
+        }
+        assertEquals("1. [T][ ] first", chatbot.getResponse("list"));
+    }
+
+    @Test
     void getResponse_reminders_usesClockAndLeavesTasksAndFileUnchanged() throws IOException {
         Path dataFile = temporaryDirectory.resolve("duke.txt");
         Files.writeString(dataFile, "D | 0 | later | 2026-09-16T15:00:00\n"

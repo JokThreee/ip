@@ -26,6 +26,32 @@ class StorageTest {
     Path temporaryDirectory;
 
     @Test
+    void saveTasks_filenameWithoutParent_roundTripsData() throws IOException {
+        Path dataFile = Files.createTempFile(Path.of(""), "storage-test-", ".txt").getFileName();
+        try {
+            Storage storage = new Storage(dataFile);
+            storage.saveTasks(new TaskList(List.of(new Todo("read book"))));
+
+            assertEquals("[T][ ] read book", storage.loadTasks().get(0).toString());
+        } finally {
+            Files.deleteIfExists(dataFile);
+        }
+    }
+
+    @Test
+    void loadTasks_invalidDeadlineDate_throwsIOExceptionWithLineNumber() throws IOException {
+        Path dataFile = temporaryDirectory.resolve("tasks.txt");
+        for (String date : List.of("2023-02-29", "2/12/2019 2400", "tomorrow")) {
+            Files.write(dataFile, List.of("T | 0 | valid", "D | 0 | return book | " + date));
+
+            IOException exception = assertThrows(IOException.class, () -> new Storage(dataFile).loadTasks());
+
+            assertEquals("invalid data on line 2: "
+                    + "Use yyyy-MM-dd or d/M/yyyy HHmm (for example, 2/12/2019 1800)", exception.getMessage());
+        }
+    }
+
+    @Test
     void loadTasks_missingFile_returnsEmptyTaskList() throws IOException {
         Path dataFile = temporaryDirectory.resolve("data").resolve("tasks.txt");
 
