@@ -26,6 +26,36 @@ class StorageTest {
     Path temporaryDirectory;
 
     @Test
+    void loadTasks_blankRequiredFields_throwsIOExceptionWithLineNumber() throws IOException {
+        Path dataFile = temporaryDirectory.resolve("tasks.txt");
+        for (String line : List.of("T | 0 |   ", "D | 0 | return book | ",
+                "E | 0 | meeting |   | 4pm", "E | 0 | meeting | 2pm | ")) {
+            Files.write(dataFile, List.of("T | 0 | valid", line));
+
+            IOException exception = assertThrows(IOException.class, () -> new Storage(dataFile).loadTasks());
+
+            assertEquals("invalid data on line 2: task fields cannot be blank", exception.getMessage());
+        }
+    }
+
+    @Test
+    void saveAndLoadTasks_eventWithEscapedTimes_preservesFieldsAndStatus() throws IOException {
+        Path dataFile = temporaryDirectory.resolve("tasks.txt");
+        Storage storage = new Storage(dataFile);
+        Event event = new Event("meeting", "Monday | Tuesday", "after \\ review\r\nends");
+        event.markAsDone();
+
+        storage.saveTasks(new TaskList(List.of(event)));
+        TaskList loaded = storage.loadTasks();
+
+        assertEquals(List.of("E | 1 | meeting | Monday \\| Tuesday | after \\\\ review\\r\\nends"),
+                Files.readAllLines(dataFile));
+        assertEquals(1, loaded.size());
+        assertEquals("[E][X] meeting (from: Monday | Tuesday to: after \\ review\r\nends)",
+                loaded.get(0).toString());
+    }
+
+    @Test
     void saveTasks_filenameWithoutParent_roundTripsData() throws IOException {
         Path dataFile = Files.createTempFile(Path.of(""), "storage-test-", ".txt").getFileName();
         try {

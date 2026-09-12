@@ -24,6 +24,35 @@ class ChimpanziniBananiniTest {
     private Path temporaryDirectory;
 
     @Test
+    void getResponse_find_formatsMatchesWithoutChangingTasksOrFile() throws IOException {
+        Path dataFile = temporaryDirectory.resolve("duke.txt");
+        Files.writeString(dataFile, "T | 0 | write essay\nT | 1 | read book\nT | 0 | return book\n");
+        ChimpanziniBananini chatbot = new ChimpanziniBananini(dataFile);
+        String originalList = chatbot.getResponse("list");
+        byte[] originalContents = Files.readAllBytes(dataFile);
+
+        assertEquals("Here are the matching tasks in your list:\n"
+                + "1. [T][X] read book\n2. [T][ ] return book", chatbot.getResponse("find book"));
+        assertEquals("Here are the matching tasks in your list:\nYour task list is empty.",
+                chatbot.getResponse("find missing"));
+        assertEquals(originalList, chatbot.getResponse("list"));
+        assertArrayEquals(originalContents, Files.readAllBytes(dataFile));
+    }
+
+    @Test
+    void getResponse_deleteLastTask_persistsEmptyList() throws IOException {
+        Path dataFile = temporaryDirectory.resolve("duke.txt");
+        Files.writeString(dataFile, "T | 0 | read book\n");
+        ChimpanziniBananini chatbot = new ChimpanziniBananini(dataFile);
+
+        assertEquals("Noted. I've removed this task:\n  [T][ ] read book\n"
+                + "Now you have 0 tasks in the list.", chatbot.getResponse("delete 1"));
+        assertEquals("Your task list is empty.", chatbot.getResponse("list"));
+        assertEquals("", Files.readString(dataFile));
+        assertEquals("Your task list is empty.", new ChimpanziniBananini(dataFile).getResponse("list"));
+    }
+
+    @Test
     void getResponse_invalidStoredDeadline_reportsLoadingErrorAndPreservesFile() throws IOException {
         Path dataFile = temporaryDirectory.resolve("duke.txt");
         String contents = "T | 0 | valid\nD | 0 | return book | 2023-02-29\n";
