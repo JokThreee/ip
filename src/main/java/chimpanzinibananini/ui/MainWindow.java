@@ -1,11 +1,13 @@
 package chimpanzinibananini.ui;
 
 import chimpanzinibananini.ChimpanziniBananini;
+import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 /**
  * Controls the main chatbot window.
@@ -47,5 +49,10 @@ public class MainWindow extends AnchorPane {
                 DialogBox.getUserDialog(input),
                 DialogBox.getChatbotDialog(response));
         userInput.clear();
+        if (input.strip().equals("bye")) {
+            PauseTransition delay = new PauseTransition(Duration.seconds(2));
+            delay.setOnFinished(event -> userInput.getScene().getWindow().hide());
+            delay.play();
+        }
     }
 }

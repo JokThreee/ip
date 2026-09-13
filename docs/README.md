@@ -34,7 +34,7 @@ Event start and end details are free text, such as `Monday afternoon` or `2pm`; 
 
 Run `reminders` whenever you want to check upcoming deadlines. It excludes overdue and completed tasks, to-dos, and events; it does not send automatic alerts.
 
-In the GUI, `bye` leaves the window open; close the window to exit. In console mode, `bye` ends the session.
+In the GUI, `bye` displays a farewell and closes the window after two seconds. In console mode, `bye` ends the session.
 
 ### Deadline dates and times
 
